@@ -4,3 +4,8 @@ export interface IProduct {
   brand: string;
   price: number;
 }
+
+export interface IRequestObj {
+  key: string;
+  value: string | number;
+}

@@ -5,6 +5,7 @@ import {selectLoading, selectProducts} from "../../store/productsSlice";
 import {getProductsInfo} from "../../store/productsThunk";
 import Product from "../../components/Product/Product";
 import PaginationProducts from "../../components/Pagination/PaginationProducts";
+import FilterFields from "../../components/FilterFields/FilterFields";
 
 const Products = () => {
   const [offsetPage, setOffsetPage] = useState(0);
@@ -23,9 +24,10 @@ const Products = () => {
       <Container>
         {
           loading ?
-              <Spinner animation="border" variant="dark" />
+              <Spinner animation="border" variant="dark"/>
               :
               <>
+                <FilterFields/>
                 <PaginationProducts
                     offsetPage={offsetPage}
                     nextPage={nextPageHandler}
