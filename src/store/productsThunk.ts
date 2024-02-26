@@ -1,31 +1,32 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import axiosApi from "../axiosApi";
-import {X_AUTH} from "../constants";
 import {IProduct} from "../types";
 
-export const getProductsInfo = createAsyncThunk<IProduct[]>(
+export const getProductsInfo = createAsyncThunk<IProduct[], number>(
     'products/getInfo',
-    async () => {
+    async (offsetPage) => {
       const productsIds = await axiosApi.post('',
           {
             "action": "get_ids",
-            "params": {"limit": 50}
-          },
-          {
-            headers: {
-              "X-Auth": X_AUTH
-            }
+            "params": {"offset": offsetPage,"limit": 50}
           });
+      const allProductsId = productsIds.data.result;
+
       const productsData = await axiosApi.post('',
           {
             "action": "get_items",
-            "params": {"ids": productsIds.data.result}
-          },
-          {
-            headers: {
-              "X-Auth": X_AUTH
-            }
-          });
-        return productsData.data.result;
+            "params": {"ids": allProductsId}
+          }
+          );
+      const allProducts : IProduct[] = productsData.data.result;
+
+      const uniqueProductsMap = new Map();
+      allProducts.forEach(product => {
+        if (!uniqueProductsMap.has(product.id)) {
+          uniqueProductsMap.set(product.id, product);
+        }
+      });
+
+      return Array.from(uniqueProductsMap.values());
     }
 )
