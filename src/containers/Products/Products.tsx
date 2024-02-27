@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Container, Row, Spinner} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../app/hook";
-import {selectLoading, selectProducts} from "../../store/productsSlice";
+import {selectError, selectLoading, selectProducts} from "../../store/productsSlice";
 import {getProductsInfo} from "../../store/productsThunk";
 import Product from "../../components/Product/Product";
 import PaginationProducts from "../../components/Pagination/PaginationProducts";
@@ -12,10 +12,18 @@ const Products = () => {
   const dispatch = useAppDispatch();
   const products = useAppSelector(selectProducts);
   const loading = useAppSelector(selectLoading);
+  const error = useAppSelector(selectError);
 
   useEffect(() => {
     dispatch(getProductsInfo(offsetPage));
   }, [dispatch, offsetPage]);
+
+  useEffect(() => {
+    if (error) {
+      console.log("ID error: " + error);
+      dispatch(getProductsInfo(offsetPage));
+    }
+  }, [error, dispatch, offsetPage]);
 
   const nextPageHandler = () => setOffsetPage(prevState => prevState + 50);
   const prevPageHandler = () => setOffsetPage(prevState => prevState - 50);

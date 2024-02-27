@@ -1,12 +1,12 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {getProductsByFilter, getProductsInfo} from "./productsThunk";
-import {IProduct} from "../types";
+import {GlobalError, IProduct} from "../types";
 import {RootState} from "../app/store";
 
 interface ProductsSlice {
   items: IProduct[];
   loading: boolean;
-  error: null;
+  error: null | GlobalError;
 }
 
 const initialState: ProductsSlice = {
@@ -29,8 +29,9 @@ const productsSlice = createSlice({
           state.loading = false;
           state.items = payload;
         })
-        .addCase(getProductsInfo.rejected, (state) => {
+        .addCase(getProductsInfo.rejected, (state, {payload: error}) => {
           state.loading = false;
+          state.error = error || null;
         });
     builder
         .addCase(getProductsByFilter.pending, (state) => {
@@ -51,3 +52,4 @@ const productsSlice = createSlice({
 export const productsReducer = productsSlice.reducer;
 export const selectProducts = (state: RootState) => state.products.items;
 export const selectLoading = (state: RootState) => state.products.loading;
+export const selectError = (state: RootState) => state.products.error;

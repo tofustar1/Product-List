@@ -1,13 +1,14 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import axiosApi from "../axiosApi";
-import {IProduct, IRequestObj} from "../types";
+import {GlobalError, IProduct, IRequestObj} from "../types";
+import {isAxiosError} from "axios";
 
 const fetchUniqueProductsById = async (ids: string[]) => {
   const productsData = await axiosApi.post('', {
     "action": "get_items",
-    "params": { "ids": ids }
+    "params": {"ids": ids}
   });
-  const allProducts : IProduct[] = productsData.data.result;
+  const allProducts: IProduct[] = productsData.data.result;
   const uniqueProductsMap = new Map<string, IProduct>();
   allProducts.forEach(product => {
     if (!uniqueProductsMap.has(product.id)) {
@@ -17,17 +18,24 @@ const fetchUniqueProductsById = async (ids: string[]) => {
   return Array.from(uniqueProductsMap.values());
 };
 
-export const getProductsInfo = createAsyncThunk<IProduct[], number>(
+export const getProductsInfo = createAsyncThunk<IProduct[], number, {rejectValue: GlobalError}>(
     'products/getProducts',
-    async (offsetPage) => {
-      const productsIds = await axiosApi.post('',
-          {
-            "action": "get_ids",
-            "params": {"offset": offsetPage,"limit": 50}
-          });
-      const allProductsId = productsIds.data.result;
+    async (offsetPage, {rejectWithValue}) => {
+      try {
+        const productsIds = await axiosApi.post('',
+            {
+              "action": "get_ids",
+              "params": {"offset": offsetPage, "limit": 50}
+            });
+        const allProductsId = productsIds.data.result;
 
-      return await fetchUniqueProductsById(allProductsId);
+        return await fetchUniqueProductsById(allProductsId);
+      } catch (e) {
+        if (isAxiosError(e) && e.response) {
+          return rejectWithValue(e.response.data);
+        }
+        throw e;
+      }
     }
 );
 

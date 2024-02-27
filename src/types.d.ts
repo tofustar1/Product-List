@@ -16,3 +16,7 @@ export interface IFilters {
   brand: string;
   price: string;
 }
+
+export interface GlobalError {
+  error: string;
+}
