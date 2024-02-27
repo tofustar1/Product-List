@@ -1,92 +1,49 @@
-import React, {useState} from 'react';
-import {Button, Form} from "react-bootstrap";
+import React, {ChangeEvent, useState} from 'react';
 import {useAppDispatch} from "../../app/hook";
 import {getProductsByFilter} from "../../store/productsThunk";
+import {IFilters} from "../../types";
+import FilterField from "./FilterField";
+import {FILTER_FIELDS} from "../../constants";
 
+const initialState : IFilters = {
+  product: '',
+  brand: '',
+  price: ''
+}
 const FilterFields = () => {
   const dispatch = useAppDispatch();
+  const [filters, setFilters] = useState(initialState);
 
-  const [name, setName] = useState<string>('');
-  const [brand, setBrand] = useState('');
-  const [price, setPrice] = useState('');
-
-  const onClickHandlerName = () => {
-    dispatch(getProductsByFilter({
-      key: "product",
-      value: name
-    }));
-    setName('');
+  const onChangeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = e.target;
+    setFilters(prevState => ({
+          ...prevState,
+          [name]: value
+        }
+    ));
   };
 
-  const onClickHandlerBrand = () => {
+  const onButtonClickHandler = (name: string) => {
     dispatch(getProductsByFilter({
-      key: "brand",
-      value: brand
+      key: name,
+      value: name === "price" ? Number(filters[name]) : filters[name]
     }));
-    setBrand('');
+    setFilters(initialState);
   };
-
-
-  const onClickHandlerPrice = () => {
-    dispatch(getProductsByFilter({
-      key: "price",
-      value: Number(price)
-    }));
-    setPrice('');
-  };
-
 
   return (
       <div className="w-50">
-        <Form.Group className="mb-3 d-flex">
-          <Form.Control
-              type="text"
-              placeholder="Filter by product name"
-              value={name}
-              name="product"
-              onChange={e => setName(e.target.value)}
-          />
-          <Button
-              type="button"
-              variant="dark"
-              className="ms-2"
-              onClick={onClickHandlerName}
-          >
-            Filter
-          </Button>
-        </Form.Group>
-        <Form.Group className="mb-3 d-flex">
-          <Form.Control
-              type="text"
-              placeholder="Filter by brand name"
-              value={brand}
-              name="brand"
-              onChange={e => setBrand(e.target.value)}
-          />
-          <Button
-              type="button"
-              variant="dark"
-              className="ms-2"
-              onClick={onClickHandlerBrand}
-          >
-            Filter
-          </Button>
-        </Form.Group>
-        <Form.Group className="mb-3 d-flex">
-          <Form.Control
-              type="text"
-              placeholder="Filter by price"
-              value={price}
-              name="price"
-              onChange={e => setPrice(e.target.value)}
-          />
-          <Button
-              type="button"
-              variant="dark"
-              className="ms-2"
-              onClick={onClickHandlerPrice}
-          >Filter</Button>
-        </Form.Group>
+        {
+          FILTER_FIELDS.map(filterName => (
+             <FilterField
+                 key={filterName}
+                 filterValue={filters[filterName]}
+                 filterName={filterName}
+                 onChange={onChangeEventHandler}
+                 onButtonClick={onButtonClickHandler}
+             />
+          ))
+        }
       </div>
   );
 };
