@@ -1,5 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {getProductsInfo} from "./productsThunk";
+import {getProductsByFilter, getProductsInfo} from "./productsThunk";
 import {IProduct} from "../types";
 import {RootState} from "../app/store";
 
@@ -31,7 +31,19 @@ const productsSlice = createSlice({
         })
         .addCase(getProductsInfo.rejected, (state) => {
           state.loading = false;
+        });
+    builder
+        .addCase(getProductsByFilter.pending, (state) => {
+          state.loading = true;
+        state.error = null;
         })
+        .addCase(getProductsByFilter.fulfilled, (state, {payload}) => {
+          state.loading = false;
+          state.items = payload;
+        })
+        .addCase(getProductsByFilter.rejected, (state) => {
+          state.loading = false;
+        });
   }
 });
 
