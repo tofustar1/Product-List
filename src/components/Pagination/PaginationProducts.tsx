@@ -12,10 +12,10 @@ const PaginationProducts : React.FC<Props> = ({offsetPage, nextPage, prevPage}) 
             <Pagination.Prev
                 disabled={!offsetPage}
                 onClick={prevPage}
-            />
+            >&lt; Prev</Pagination.Prev>
             <Pagination.Next
                 onClick={nextPage}
-            />
+            >Next &gt;</Pagination.Next>
           </Pagination>
       );
 };
